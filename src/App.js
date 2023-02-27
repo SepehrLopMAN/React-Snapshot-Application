@@ -2,12 +2,26 @@ import { useReducer } from "react";
 import styled, { css } from "styled-components";
 import "./App.css";
 
-const Container = styled.div`
+const PageTitle = styled.h1`
+  text-align: center;
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  border-bottom: 1px solid grey;
+  display: inline-block;
+  text-transform: uppercase;
+  position: relative;
+  letter-spacing: 0.125rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.875rem 1.5rem;
+  margin: 2rem auto;
+`;
+
+const ShaperWrapper = styled.div`
   position: relative;
   border: 2px dashed grey;
   width: 480px;
   height: 480px;
-  margin: 2rem auto;
+  margin: 4rem auto;
 `;
 
 const ModifiableShape = styled.div.attrs(
@@ -40,21 +54,32 @@ const RangeInput = styled.input.attrs({
         transform-origin: left;
         transform: rotate(90deg);
       `}
+    appearance: none;
+    background: transparent;
   }
   &:foucos {
     outline: none;
   }
 
-  &:-webkit-thumb-slider {
+  &::-webkit-slider-thumb {
     appearance: none;
-    border: 2px solid red;
+    border: 2px solid black;
+    height: 1rem;
+    width: 1rem;
+    background: white;
+    cursor: pointer;
+    transition: all 300ms;
+    pointer-events: all;
+  }
+  &::-webkit-slider-thumb:hover {
+    background-color: aqua;
+    box-shadow: 0 0 0 0.375rem white;
   }
 `;
 
 const App = () => {
   const [BRState, dispatch] = useReducer(
     (state, modifierObject) => {
-      console.log(modifierObject, state, state[`${modifierObject.side}`]);
       if (state[`${modifierObject.side}`] === undefined) {
         throw Error("Unknown Action: " + modifierObject);
       }
@@ -72,34 +97,37 @@ const App = () => {
     };
   }
   return (
-    <Container>
-      <ModifiableShape $borderRadius={BRState} />
-      <RangeInput
-        value={BRState.top}
-        onChange={onChangeHandler("top")}
-        style={{ top: "calc(-0.5rem - 4px)", left: "calc(-0.5rem - 4px)" }}
-      />
-      <RangeInput
-        $left={true}
-        value={BRState.left}
-        onChange={onChangeHandler("left")}
-        style={{ top: "calc(-0.5rem - 0.5rem - 4px)", left: "calc(-4px)" }}
-      />
-      <RangeInput
-        $right={true}
-        value={BRState.right}
-        onChange={onChangeHandler("right")}
-        style={{ top: "calc(-0.5rem - 0.5rem - 4px)", left: "calc(100%)" }}
-      />
-      <RangeInput
-        value={BRState.bottom}
-        onChange={onChangeHandler("bottom")}
-        style={{
-          bottom: "calc(-0.5rem - 4px)",
-          left: "calc(-0.5rem - 4px)",
-        }}
-      />
-    </Container>
+    <>
+      <PageTitle>Fancy-border-radius</PageTitle>
+      <ShaperWrapper>
+        <ModifiableShape $borderRadius={BRState} />
+        <RangeInput
+          value={BRState.top}
+          onChange={onChangeHandler("top")}
+          style={{ top: "calc(-0.5rem - 4px)", left: "calc(-0.5rem - 4px)" }}
+        />
+        <RangeInput
+          $left={true}
+          value={BRState.left}
+          onChange={onChangeHandler("left")}
+          style={{ top: "calc(-0.5rem - 0.5rem - 4px)", left: "calc(-4px)" }}
+        />
+        <RangeInput
+          $right={true}
+          value={BRState.right}
+          onChange={onChangeHandler("right")}
+          style={{ top: "calc(-0.5rem - 0.5rem - 4px)", left: "calc(100%)" }}
+        />
+        <RangeInput
+          value={BRState.bottom}
+          onChange={onChangeHandler("bottom")}
+          style={{
+            bottom: "calc(-0.5rem - 4px)",
+            left: "calc(-0.5rem - 4px)",
+          }}
+        />
+      </ShaperWrapper>
+    </>
   );
 };
 
