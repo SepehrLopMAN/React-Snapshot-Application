@@ -8,4 +8,7 @@ body {
 
 #root {
   padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  place-items: center;
 }

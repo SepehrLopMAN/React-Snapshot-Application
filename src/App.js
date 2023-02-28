@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useReducer, useRef } from "react";
 import styled, { css } from "styled-components";
 import "./App.css";
 
@@ -8,10 +8,7 @@ const PageTitle = styled.h1`
   border-bottom: 1px solid grey;
   display: inline-block;
   text-transform: uppercase;
-  position: relative;
   letter-spacing: 0.125rem;
-  left: 50%;
-  transform: translateX(-50%);
   padding: 0.875rem 1.5rem;
   margin: 2rem auto;
 `;
@@ -19,8 +16,8 @@ const PageTitle = styled.h1`
 const ShaperWrapper = styled.div`
   position: relative;
   border: 2px dashed grey;
-  width: 480px;
-  height: 480px;
+  width: ${({ $width }) => $width ?? 481}px;
+  height: ${({ $height }) => $height ?? 481}px;
   margin: 4rem auto;
 `;
 
@@ -39,14 +36,10 @@ const ModifiableShape = styled.div.attrs(
   height: 100%;
   background-image: linear-gradient(45deg, darkblue, deeppink);
   box-shadow: -100px 100px 0px 0px #ffffff12;
-  // ???????????????????????????????
 `;
 
-const RangeInput = styled.input.attrs({
-  type: "range",
-})`
+const SliderSpan = styled.span`
   & {
-    width: calc(100% + 1rem + 4px);
     position: absolute;
     ${({ $right, $left }) =>
       ($right || $left) &&
@@ -54,24 +47,18 @@ const RangeInput = styled.input.attrs({
         transform-origin: left;
         transform: rotate(90deg);
       `}
-    appearance: none;
     background: transparent;
-  }
-  &:foucos {
-    outline: none;
-  }
-
-  &::-webkit-slider-thumb {
-    appearance: none;
     border: 2px solid black;
     height: 1rem;
     width: 1rem;
     background: white;
     cursor: pointer;
-    transition: all 300ms;
-    pointer-events: all;
+    transition: background-color 300ms, box-shadow 300ms;
+    user-select: none;
+    box-sizing: border-box;
   }
-  &::-webkit-slider-thumb:hover {
+  &:hover,
+  &:active {
     background-color: aqua;
     box-shadow: 0 0 0 0.375rem white;
   }
@@ -91,42 +78,106 @@ const App = () => {
     { top: 10, left: 20, bottom: 30, right: 40 }
   );
 
-  function onChangeHandler(target) {
-    return ({ target: { value } }) => {
-      dispatch({ side: target, newValue: value });
+  function dispatchHandler(targetedSide, relativeTargetedSide) {
+    return ({ style }) => {
+      dispatch({
+        side: targetedSide,
+        newValue: parseInt(style[`${relativeTargetedSide}`].split("%")[0]),
+      });
     };
   }
+  let wrapperRef = useRef();
+  const mouseDownHandler =
+    (targetedSide, relativeTargetedSide) =>
+    ({ target }) => {
+      const mouseMoveHandler = (e) => {
+        // console.log(target.style["left"]);
+        dispatchHandler(targetedSide, relativeTargetedSide)(target);
+        const wrapperBounds = wrapperRef.current.getBoundingClientRect(); // add to params ??
+        const percentage = Math.floor(
+          (relativeTargetedSide === "top" &&
+            ((e.clientY - wrapperBounds.y) * 100) / wrapperBounds.height) ||
+            (relativeTargetedSide === "left" &&
+              ((e.clientX - wrapperBounds.x) * 100) / wrapperBounds.width) ||
+            0
+        );
+        const calculatedPercentage =
+          percentage < 0 ? 0 : percentage > 100 ? 100 : percentage;
+        target.style[`${relativeTargetedSide}`] = `${calculatedPercentage}%`;
+      };
+      window.addEventListener("mousemove", mouseMoveHandler);
+      window.addEventListener("mouseup", () => {
+        window.removeEventListener("mousemove", mouseMoveHandler);
+      });
+    };
   return (
     <>
       <PageTitle>Fancy-border-radius</PageTitle>
-      <ShaperWrapper>
+      <ShaperWrapper ref={wrapperRef}>
         <ModifiableShape $borderRadius={BRState} />
-        <RangeInput
-          value={BRState.top}
-          onChange={onChangeHandler("top")}
-          style={{ top: "calc(-0.5rem - 4px)", left: "calc(-0.5rem - 4px)" }}
-        />
-        <RangeInput
-          $left={true}
-          value={BRState.left}
-          onChange={onChangeHandler("left")}
-          style={{ top: "calc(-0.5rem - 0.5rem - 4px)", left: "calc(-4px)" }}
-        />
-        <RangeInput
-          $right={true}
-          value={BRState.right}
-          onChange={onChangeHandler("right")}
-          style={{ top: "calc(-0.5rem - 0.5rem - 4px)", left: "calc(100%)" }}
-        />
-        <RangeInput
-          value={BRState.bottom}
-          onChange={onChangeHandler("bottom")}
+        <SliderSpan
+          onMouseDownCapture={mouseDownHandler("top", "left")}
           style={{
-            bottom: "calc(-0.5rem - 4px)",
-            left: "calc(-0.5rem - 4px)",
+            top: "calc(-0.5rem)",
+            marginLeft: `calc(-0.5rem)`,
+            left: `${BRState.top}%`,
+          }}
+        />
+        <SliderSpan
+          onMouseDownCapture={mouseDownHandler("left", "top")}
+          style={{
+            left: "calc(-0.5rem)",
+            marginTop: `calc(-0.5rem)`,
+            top: `${BRState.left}%`,
+          }}
+        />
+        <SliderSpan
+          onMouseDownCapture={mouseDownHandler("bottom", "left")}
+          style={{
+            bottom: "calc(-0.5rem)",
+            marginLeft: `calc(-0.5rem)`,
+            left: `${BRState.bottom}%`,
+          }}
+        />
+        <SliderSpan
+          onMouseDownCapture={mouseDownHandler("right", "top")}
+          style={{
+            right: "calc(-0.5rem)",
+            marginTop: `calc(-0.5rem)`,
+            top: `${BRState.right}%`,
           }}
         />
       </ShaperWrapper>
+
+      <div
+        style={{
+          backgroundColor: "white",
+          color: "black",
+          padding: "1rem",
+          textAlign: "center",
+          fontSize: "1.125rem",
+          fontFamily: "'M PLUS Rounded 1c',sans-serif",
+          display: "inline-block",
+        }}
+      >
+        {(({ left, right, top, bottom }) =>
+          `${top}% ${100 - top}% ${
+            100 - bottom
+          }% ${bottom}% / ${left}% ${right}% ${100 - right}% ${100 - left}% `)(
+          BRState
+        )}
+      </div>
+      <button
+        onClick={({
+          target: {
+            previousSibling: { innerText },
+          },
+        }) => {
+          navigator.clipboard.writeText(innerText);
+        }}
+      >
+        Copy
+      </button>
     </>
   );
 };
