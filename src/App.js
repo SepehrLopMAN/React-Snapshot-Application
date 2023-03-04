@@ -16,8 +16,10 @@ const PageTitle = styled.h1`
 const ShaperWrapper = styled.div`
   position: relative;
   border: 2px dashed grey;
-  width: ${({ $width }) => $width ?? 481}px;
-  height: ${({ $height }) => $height ?? 481}px;
+  width: ${({ $width }) =>
+    $width ?? "calc(100vmin - 1rem - 1.5rem /* hover/active state size */)"};
+  height: ${({ $height }) =>
+    $height ?? "calc(100vmin - 1rem - 1.5rem /* hover/active state size */)"};
   margin: 4rem auto;
 `;
 
@@ -56,6 +58,9 @@ const SliderSpan = styled.span`
     transition: background-color 300ms, box-shadow 300ms;
     user-select: none;
     box-sizing: border-box;
+    //
+    touch-action: none;
+    //
   }
   &:hover,
   &:active {
@@ -87,10 +92,10 @@ const App = () => {
     };
   }
   let wrapperRef = useRef();
-  const mouseDownHandler =
+  const pointerDownHandler =
     (targetedSide, relativeTargetedSide) =>
     ({ target }) => {
-      const mouseMoveHandler = (e) => {
+      const pointerMoveHandler = (e) => {
         // console.log(target.style["left"]);
         dispatchHandler(targetedSide, relativeTargetedSide)(target);
         const wrapperBounds = wrapperRef.current.getBoundingClientRect(); // add to params ??
@@ -105,9 +110,10 @@ const App = () => {
           percentage < 0 ? 0 : percentage > 100 ? 100 : percentage;
         target.style[`${relativeTargetedSide}`] = `${calculatedPercentage}%`;
       };
-      window.addEventListener("mousemove", mouseMoveHandler);
-      window.addEventListener("mouseup", () => {
-        window.removeEventListener("mousemove", mouseMoveHandler);
+
+      window.addEventListener("pointermove", pointerMoveHandler);
+      window.addEventListener("pointerup", () => {
+        window.removeEventListener("pointermove", pointerMoveHandler);
       });
     };
   return (
@@ -116,68 +122,84 @@ const App = () => {
       <ShaperWrapper ref={wrapperRef}>
         <ModifiableShape $borderRadius={BRState} />
         <SliderSpan
-          onMouseDownCapture={mouseDownHandler("top", "left")}
+          onPointerDown={pointerDownHandler("top", "left")}
           style={{
             top: "calc(-0.5rem)",
-            marginLeft: `calc(-0.5rem)`,
+            marginLeft: "calc(-0.5rem)",
             left: `${BRState.top}%`,
           }}
         />
         <SliderSpan
-          onMouseDownCapture={mouseDownHandler("left", "top")}
+          onPointerDown={pointerDownHandler("left", "top")}
           style={{
             left: "calc(-0.5rem)",
-            marginTop: `calc(-0.5rem)`,
+            marginTop: "calc(-0.5rem)",
             top: `${BRState.left}%`,
           }}
         />
         <SliderSpan
-          onMouseDownCapture={mouseDownHandler("bottom", "left")}
+          onPointerDown={pointerDownHandler("bottom", "left")}
           style={{
             bottom: "calc(-0.5rem)",
-            marginLeft: `calc(-0.5rem)`,
+            marginLeft: "calc(-0.5rem)",
             left: `${BRState.bottom}%`,
           }}
         />
         <SliderSpan
-          onMouseDownCapture={mouseDownHandler("right", "top")}
+          onPointerDown={pointerDownHandler("right", "top")}
           style={{
             right: "calc(-0.5rem)",
-            marginTop: `calc(-0.5rem)`,
+            marginTop: "calc(-0.5rem)",
             top: `${BRState.right}%`,
           }}
         />
       </ShaperWrapper>
 
-      <div
-        style={{
-          backgroundColor: "white",
-          color: "black",
-          padding: "1rem",
-          textAlign: "center",
-          fontSize: "1.125rem",
-          fontFamily: "'M PLUS Rounded 1c',sans-serif",
-          display: "inline-block",
-        }}
-      >
-        {(({ left, right, top, bottom }) =>
-          `${top}% ${100 - top}% ${
-            100 - bottom
-          }% ${bottom}% / ${left}% ${right}% ${100 - right}% ${100 - left}% `)(
-          BRState
-        )}
-      </div>
-      <button
-        onClick={({
-          target: {
-            previousSibling: { innerText },
-          },
-        }) => {
-          navigator.clipboard.writeText(innerText);
-        }}
-      >
-        Copy
-      </button>
+      <section>
+        <div>
+          <span>border-radius : </span>
+          <div
+            style={{
+              backgroundColor: "white",
+              color: "black",
+              padding: "1rem",
+              textAlign: "center",
+              fontSize: "1.125rem",
+              fontFamily: "'M PLUS Rounded 1c',sans-serif",
+              display: "inline-block",
+            }}
+          >
+            {(({ left, right, top, bottom }) =>
+              `${top}% ${100 - top}% ${
+                100 - bottom
+              }% ${bottom}% / ${left}% ${right}% ${100 - right}% ${
+                100 - left
+              }% `)(BRState)}
+          </div>
+          <button
+            onClick={({
+              target: {
+                previousSibling: { innerText },
+              },
+            }) => {
+              console.log(innerText);
+              navigator.clipboard
+                .writeText(innerText)
+                .then()
+                .catch((err) => {
+                  console.error(err);
+                });
+            }}
+          >
+            Copy
+          </button>
+        </div>
+        <div>
+          <label>
+            Custom size: <input type="" />
+          </label>
+        </div>
+      </section>
     </>
   );
 };
