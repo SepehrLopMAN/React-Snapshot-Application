@@ -1,3 +1,4 @@
+import Clipboard from "@react-native-clipboard/clipboard";
 import { useReducer, useRef } from "react";
 import styled, { css } from "styled-components";
 import "./App.css";
@@ -69,7 +70,10 @@ const SliderSpan = styled.span`
   }
 `;
 
+const CustomizationContainer = () => {};
+
 const App = () => {
+  let wrapperRef = useRef();
   const [BRState, dispatch] = useReducer(
     (state, modifierObject) => {
       if (state[`${modifierObject.side}`] === undefined) {
@@ -91,7 +95,7 @@ const App = () => {
       });
     };
   }
-  let wrapperRef = useRef();
+
   const pointerDownHandler =
     (targetedSide, relativeTargetedSide) =>
     ({ target }) => {
@@ -110,7 +114,6 @@ const App = () => {
           percentage < 0 ? 0 : percentage > 100 ? 100 : percentage;
         target.style[`${relativeTargetedSide}`] = `${calculatedPercentage}%`;
       };
-
       window.addEventListener("pointermove", pointerMoveHandler);
       window.addEventListener("pointerup", () => {
         window.removeEventListener("pointermove", pointerMoveHandler);
@@ -164,8 +167,6 @@ const App = () => {
               color: "black",
               padding: "1rem",
               textAlign: "center",
-              fontSize: "1.125rem",
-              fontFamily: "'M PLUS Rounded 1c',sans-serif",
               display: "inline-block",
             }}
           >
@@ -177,18 +178,17 @@ const App = () => {
               }% `)(BRState)}
           </div>
           <button
-            onClick={({
-              target: {
-                previousSibling: { innerText },
-              },
-            }) => {
-              console.log(innerText);
-              navigator.clipboard
-                .writeText(innerText)
-                .then()
-                .catch((err) => {
-                  console.error(err);
-                });
+            onClick={({ target }) => {
+              const data = target.previousSibling.innerText;
+              try {
+                Clipboard.setString(data);
+                target.innerText = "Copied!";
+                setTimeout(() => {
+                  target.innerText = "Copy";
+                }, 2000);
+              } catch (err) {
+                console.error(err);
+              }
             }}
           >
             Copy
