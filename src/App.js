@@ -1,5 +1,5 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import { useReducer, useRef } from "react";
+import { useReducer, useRef, useState } from "react";
 import styled, { css } from "styled-components";
 import "./App.css";
 
@@ -14,14 +14,21 @@ const PageTitle = styled.h1`
   margin: 2rem auto;
 `;
 
-const ShaperWrapper = styled.div`
+const ShaperWrapper = styled.div.attrs(({ $width, $height }) => ({
+  style: {
+    width: $width
+      ? `${$width}px`
+      : "calc(55vmin - 1rem - 1.5rem /* hover/active state size */)",
+    height: $height
+      ? `${$height}px`
+      : "calc(55vmin - 1rem - 1.5rem /* hover/active state size */)",
+  },
+}))`
   position: relative;
   border: 2px dashed grey;
-  width: ${({ $width }) =>
-    $width ?? "calc(100vmin - 1rem - 1.5rem /* hover/active state size */)"};
-  height: ${({ $height }) =>
-    $height ?? "calc(100vmin - 1rem - 1.5rem /* hover/active state size */)"};
   margin: 4rem auto;
+  min-width: 225px;
+  min-height: 225px;
 `;
 
 const ModifiableShape = styled.div.attrs(
@@ -70,7 +77,32 @@ const SliderSpan = styled.span`
   }
 `;
 
-const CustomizationContainer = () => {};
+const BorderRadiusCopier = ({ children }) => {
+  return (
+    <div className="br-copier-wrapper">
+      <span>border-radius : </span>
+      <div className="br-copier-wrapper__copier">
+        {children}
+        <button
+          onClick={({ target }) => {
+            const data = target.previousSibling.innerText;
+            try {
+              Clipboard.setString(data);
+              target.innerText = "Copied! 👍";
+              setTimeout(() => {
+                target.innerText = "Copy";
+              }, 2000);
+            } catch (err) {
+              console.error(err);
+            }
+          }}
+        >
+          Copy
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const App = () => {
   let wrapperRef = useRef();
@@ -100,7 +132,6 @@ const App = () => {
     (targetedSide, relativeTargetedSide) =>
     ({ target }) => {
       const pointerMoveHandler = (e) => {
-        // console.log(target.style["left"]);
         dispatchHandler(targetedSide, relativeTargetedSide)(target);
         const wrapperBounds = wrapperRef.current.getBoundingClientRect(); // add to params ??
         const percentage = Math.floor(
@@ -119,10 +150,13 @@ const App = () => {
         window.removeEventListener("pointermove", pointerMoveHandler);
       });
     };
+  const [customizable, setCustomizable] = useState(false);
+  const [widthValue, setWidthValue] = useState(null);
+  const [heightValue, setHeightValue] = useState(null);
   return (
     <>
       <PageTitle>Fancy-border-radius</PageTitle>
-      <ShaperWrapper ref={wrapperRef}>
+      <ShaperWrapper $width={widthValue} $height={heightValue} ref={wrapperRef}>
         <ModifiableShape $borderRadius={BRState} />
         <SliderSpan
           onPointerDown={pointerDownHandler("top", "left")}
@@ -157,49 +191,65 @@ const App = () => {
           }}
         />
       </ShaperWrapper>
-
-      <section>
-        <div>
-          <span>border-radius : </span>
-          <div
-            style={{
-              backgroundColor: "white",
-              color: "black",
-              padding: "1rem",
-              textAlign: "center",
-              display: "inline-block",
-            }}
-          >
-            {(({ left, right, top, bottom }) =>
-              `${top}% ${100 - top}% ${
-                100 - bottom
-              }% ${bottom}% / ${left}% ${right}% ${100 - right}% ${
-                100 - left
-              }% `)(BRState)}
-          </div>
-          <button
-            onClick={({ target }) => {
-              const data = target.previousSibling.innerText;
-              try {
-                Clipboard.setString(data);
-                target.innerText = "Copied!";
-                setTimeout(() => {
-                  target.innerText = "Copy";
-                }, 2000);
-              } catch (err) {
-                console.error(err);
-              }
-            }}
-          >
-            Copy
-          </button>
+      <BorderRadiusCopier>
+        <div className="br-value-container">
+          {(({ left, right, top, bottom }) =>
+            `${top}% ${100 - top}% ${
+              100 - bottom
+            }% ${bottom}% / ${left}% ${right}% ${100 - right}% ${
+              100 - left
+            }% `)(BRState)}
         </div>
-        <div>
+      </BorderRadiusCopier>
+      <div className="input-group">
+        <div className="input-group__switch-container">
           <label>
-            Custom size: <input type="" />
+            Custom size:
+            <input
+              className="switch-input"
+              type="checkbox"
+              value={customizable}
+              onChange={() => setCustomizable((val) => !val)}
+              hidden
+            />
+            <div className="input-group__switch"></div>
           </label>
         </div>
-      </section>
+        {customizable && (
+          <div className="input-group__size-customization-wrapper">
+            <label>
+              Width:
+              <input
+                type="number"
+                min={225}
+                max={1000}
+                value={
+                  widthValue ??
+                  parseInt(wrapperRef.current.getBoundingClientRect().width)
+                }
+                onChange={({ target: { value } }) => {
+                  setWidthValue(value);
+                }}
+              />
+            </label>
+            <label>
+              Height:
+              <input
+                type="number"
+                min={225}
+                max={1000}
+                value={
+                  heightValue ??
+                  parseInt(wrapperRef.current.getBoundingClientRect().height)
+                }
+                onChange={({ target: { value } }) => {
+                  setHeightValue(value);
+                }}
+              />
+            </label>
+          </div>
+        )}
+      </div>
     </>
   );
 };
