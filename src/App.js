@@ -7,10 +7,7 @@ const PageTitle = styled.h1`
   text-align: center;
   font-family: "M PLUS Rounded 1c", sans-serif;
   border-bottom: 1px solid grey;
-  display: inline-block;
-  text-transform: uppercase;
-  letter-spacing: 0.125rem;
-  padding: 0.875rem 1.5rem;
+  display: inline-block;4465rem;
   margin: 2rem auto;
 `;
 
@@ -133,7 +130,7 @@ const App = () => {
     ({ target }) => {
       const pointerMoveHandler = (e) => {
         dispatchHandler(targetedSide, relativeTargetedSide)(target);
-        const wrapperBounds = wrapperRef.current.getBoundingClientRect(); // add to params ??
+        const wrapperBounds = wrapperRef.current.getBoundingClientRect();
         const percentage = Math.floor(
           (relativeTargetedSide === "top" &&
             ((e.clientY - wrapperBounds.y) * 100) / wrapperBounds.height) ||
@@ -148,6 +145,7 @@ const App = () => {
       window.addEventListener("pointermove", pointerMoveHandler);
       window.addEventListener("pointerup", () => {
         window.removeEventListener("pointermove", pointerMoveHandler);
+        dispatchHandler(targetedSide, relativeTargetedSide)(target);
       });
     };
   const [customizable, setCustomizable] = useState(false);
@@ -156,7 +154,11 @@ const App = () => {
   return (
     <>
       <PageTitle>Fancy-border-radius</PageTitle>
-      <ShaperWrapper $width={widthValue} $height={heightValue} ref={wrapperRef}>
+      <ShaperWrapper
+        $width={customizable ? widthValue : null}
+        $height={customizable ? heightValue : null}
+        ref={wrapperRef}
+      >
         <ModifiableShape $borderRadius={BRState} />
         <SliderSpan
           onPointerDown={pointerDownHandler("top", "left")}

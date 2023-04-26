@@ -6,6 +6,7 @@ body {
   font-size: 1.25rem;
   margin: auto auto 4rem;
   min-width: 350px;
+  overflow-x: hidden;
 }
 
 label {
