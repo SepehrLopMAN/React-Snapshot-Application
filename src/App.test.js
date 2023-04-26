@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import App from "./App";
 
-test("renders border-radius app", () => {
+test("renders Snap Shot app", () => {
   render(<App />);
-  const linkElement = screen.getByText(/Fancy-Border-Radius/i);
+  const linkElement = screen.getByText(/Snap Shot/i);
   expect(linkElement).toBeInTheDocument();
 });
