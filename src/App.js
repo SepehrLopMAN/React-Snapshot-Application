@@ -4,6 +4,7 @@ import BrInfoComponent from "./components/BrInfoComponent";
 import CostumizerComponent from "./components/CustomizerComponent";
 import { GlobalStyles } from "./components/styled/Global";
 import {
+  FileLabel,
   ModifiableShape,
   PageTitle,
   ShaperWrapper,
@@ -22,16 +23,30 @@ const App = () => {
   const [customizable, setCustomizable] = useState(false);
   const [widthValue, setWidthValue] = useState(null);
   const [heightValue, setHeightValue] = useState(null);
+  const [userImage, setUserImage] = useState(null);
   return (
     <>
       <GlobalStyles />
-      <PageTitle>Snap Shot</PageTitle>
+      <PageTitle>Snapshot</PageTitle>
+
+      <FileLabel imgIsUsed={userImage !== null}>
+        <h2>Choose Your Image</h2>
+        <input
+          hidden
+          type="file"
+          onChange={({ target: { files } }) => {
+            setUserImage(
+              files.length > 0 ? URL.createObjectURL(files[0]) : null
+            );
+          }}
+        />
+      </FileLabel>
       <ShaperWrapper
         $width={customizable ? widthValue : null}
         $height={customizable ? heightValue : null}
         ref={wrapperRef}
       >
-        <ModifiableShape $borderRadius={BRState} />
+        <ModifiableShape $borderRadius={BRState} $background={userImage} />
         <SliderSpan
           onPointerDown={pointerDownHandler("top", "left", {
             wrapperRef,

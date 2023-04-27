@@ -10,9 +10,11 @@ export const PageTitle = styled.h1`
 
 export const ShaperWrapper = styled.div.attrs(({ $width, $height }) => ({
   style: {
-    width: $width
-      ? `${$width}px`
-      : "calc(55vmin - 1rem - 1.5rem /* hover/active state size */)",
+    width: `min(${
+      $width
+        ? `${$width}px`
+        : "calc(55vmin - 1rem - 1.5rem /* hover/active state size */)"
+    },100%)`,
     height: $height
       ? `${$height}px`
       : "calc(55vmin - 1rem - 1.5rem /* hover/active state size */)",
@@ -38,7 +40,11 @@ export const ModifiableShape = styled.div.attrs(
 )`
   width: 100%;
   height: 100%;
-  background-image: linear-gradient(45deg, darkblue, deeppink);
+  background: ${({ $background }) =>
+      $background
+        ? `url("${$background}")`
+        : "linear-gradient(45deg, darkblue, deeppink)"}
+    center center / 100% 100% no-repeat;
   box-shadow: -100px 100px 0px 0px #ffffff12;
 `;
 
@@ -66,5 +72,19 @@ export const SliderSpan = styled.span`
   &:active {
     background-color: aqua;
     box-shadow: 0 0 0 0.375rem white;
+  }
+`;
+
+export const FileLabel = styled.label`
+  & {
+    border: 3px double ${({ imgIsUsed }) => (imgIsUsed ? "green" : "#bd8300")};
+    padding: 0.325rem 1.325rem;
+    cursor: pointer;
+    transition: transform 0.3s;
+    user-select: none;
+  }
+
+  &:hover {
+    transform: scale(1.1);
   }
 `;
