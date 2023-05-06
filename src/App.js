@@ -1,16 +1,21 @@
+import { useEffect } from "react";
 import { useReducer, useRef, useState } from "react";
 import "./App.css";
 import BrInfoComponent from "./components/BrInfoComponent";
 import CostumizerComponent from "./components/CustomizerComponent";
+import ImagePicker from "./components/ImagePicker";
 import { GlobalStyles } from "./components/styled/Global";
 import {
-  FileLabel,
   ModifiableShape,
   PageTitle,
   ShaperWrapper,
   SliderSpan,
 } from "./components/styled/UtileComponents";
-import { brReducerHandler, pointerDownHandler } from "./services/handlers";
+import {
+  brReducerHandler,
+  gcd_calc,
+  pointerDownHandler,
+} from "./services/handlers";
 
 const App = () => {
   let wrapperRef = useRef(null);
@@ -23,30 +28,35 @@ const App = () => {
   const [customizable, setCustomizable] = useState(false);
   const [widthValue, setWidthValue] = useState(null);
   const [heightValue, setHeightValue] = useState(null);
-  const [userImage, setUserImage] = useState(null);
+  const [userImageSrc, setUserImageSrc] = useState(null);
+  const [userImageAR, setUserImageAR] = useState(null);
+
+  useEffect(() => {
+    let userImg = new Image();
+    userImg.onload = () => {
+      const { width, height } = userImg;
+      const gcd = gcd_calc(width, height);
+      setUserImageAR(
+        width !== 0 && height !== 0 ? `${width / gcd} / ${height / gcd}` : null
+      );
+    };
+    userImg.src = userImageSrc;
+    return () => {
+      userImg = null;
+    };
+  }, [userImageSrc]);
   return (
     <>
       <GlobalStyles />
       <PageTitle>Snapshot</PageTitle>
-
-      <FileLabel imgIsUsed={userImage !== null}>
-        <h2>Choose Your Image</h2>
-        <input
-          hidden
-          type="file"
-          onChange={({ target: { files } }) => {
-            setUserImage(
-              files.length > 0 ? URL.createObjectURL(files[0]) : null
-            );
-          }}
-        />
-      </FileLabel>
+      <ImagePicker {...{ userImageSrc, setUserImageSrc }} />
       <ShaperWrapper
         $width={customizable ? widthValue : null}
         $height={customizable ? heightValue : null}
+        $aspectRatio={userImageAR}
         ref={wrapperRef}
       >
-        <ModifiableShape $borderRadius={BRState} $background={userImage} />
+        <ModifiableShape $borderRadius={BRState} $background={userImageSrc} />
         <SliderSpan
           onPointerDown={pointerDownHandler("top", "left", {
             wrapperRef,

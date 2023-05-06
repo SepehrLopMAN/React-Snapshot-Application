@@ -36,6 +36,14 @@ export function pointerDownHandler(
   };
 }
 
+export function gcd_calc(x, y) {
+  if (typeof x !== "number" || typeof y !== "number") return false;
+  while (y) {
+    [y, x] = [x % y, y];
+  }
+  return x;
+}
+
 function brDispatchHandler(targetedSide, relativeTargetedSide, dispatch) {
   return ({ style }) => {
     dispatch({

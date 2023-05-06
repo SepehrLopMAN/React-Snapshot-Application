@@ -1,6 +1,6 @@
 {
   "name": "snapshot-application",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "private": true,
   "dependencies": {
     "@react-native-clipboard/clipboard": "^1.11.2",

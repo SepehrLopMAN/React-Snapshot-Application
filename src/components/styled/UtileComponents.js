@@ -15,11 +15,10 @@ export const ShaperWrapper = styled.div.attrs(({ $width, $height }) => ({
         ? `${$width}px`
         : "calc(55vmin - 1rem - 1.5rem /* hover/active state size */)"
     },100%)`,
-    height: $height
-      ? `${$height}px`
-      : "calc(55vmin - 1rem - 1.5rem /* hover/active state size */)",
+    ...($height && { height: `${$height}px` }),
   },
 }))`
+  aspect-ratio: ${({ $aspectRatio }) => $aspectRatio ?? "1 / 1"};
   position: relative;
   border: 2px dashed grey;
   margin: 4rem auto;
@@ -27,7 +26,7 @@ export const ShaperWrapper = styled.div.attrs(({ $width, $height }) => ({
   min-height: 225px;
 `;
 
-export const ModifiableShape = styled.div.attrs(
+export const ModifiableShape = styled.canvas.attrs(
   ({ $borderRadius: { top, bottom, left, right } }) => {
     return {
       style: {
