@@ -29,26 +29,38 @@ export function pointerDownHandler(
       target.style[`${relativeTargetedSide}`] = `${calculatedPercentage}%`;
     };
     window.addEventListener("pointermove", pointerMoveHandler);
-    window.addEventListener("pointerup", () => {
-      window.removeEventListener("pointermove", pointerMoveHandler);
-      brDispatchHandler(targetedSide, relativeTargetedSide, brDispatch)(target);
-    });
+    window.addEventListener(
+      "pointerup",
+      () => {
+        window.removeEventListener("pointermove", pointerMoveHandler);
+        brDispatchHandler(
+          targetedSide,
+          relativeTargetedSide,
+          brDispatch
+        )(target);
+      },
+      { once: true }
+    );
   };
-}
-
-export function gcd_calc(x, y) {
-  if (typeof x !== "number" || typeof y !== "number") return false;
-  while (y) {
-    [y, x] = [x % y, y];
-  }
-  return x;
 }
 
 function brDispatchHandler(targetedSide, relativeTargetedSide, dispatch) {
   return ({ style }) => {
     dispatch({
       side: targetedSide,
-      newValue: parseInt(style[`${relativeTargetedSide}`].split("%")[0]),
+      newValue: style[`${relativeTargetedSide}`].split("%")[0],
     });
   };
 }
+
+export const brUrlParamHandler = function (elem) {
+  return elem
+    ?.split("-")
+    .map((value) =>
+      isNaN(Number(value)) ? null : Number(value) > 100 ? 100 : Number(value)
+    );
+};
+
+export const dimensionsLenHandler = function (elem) {
+  return isNaN(Number(elem)) ? null : Number(elem);
+};

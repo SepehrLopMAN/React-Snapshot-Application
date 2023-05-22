@@ -34,4 +34,21 @@ html {
     flex-direction: column;
     align-items: center;
   }
+
+  /* ScrollBar */
+  ::-webkit-scrollbar {
+    width: 0.25rem;
+    height: 0.25rem;
+  }
+  ::-webkit-scrollbar-track {
+    background: #ffffff30;
+    border-radius: 1.25rem;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #ffb300;
+    border-radius: 1.25rem;
+  }
+  ::-webkit-scrollbar-thumb:active {
+    background: #bd8300;
+  
 `;

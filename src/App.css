@@ -3,8 +3,11 @@
   display: flex;
   justify-content: space-between;
   margin: auto auto 1.5rem;
-  width: 85%;
-  max-width: calc(140px + 3rem + 490px);
+  max-width: calc(140px + 3rem + 490px + 70px + 0.25rem);
+}
+
+.br-copier-wrapper {
+  padding: 0.75rem;
 }
 
 .input-group {
@@ -22,22 +25,95 @@
   gap: 1rem;
 }
 
-.br-copier-wrapper__copier button {
+.br-copier__buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.br-copy-btn,
+.bookmark-btn {
   border: none;
   cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 0.125rem;
-  font-weight: 600;
   font-size: inherit;
+  transition: all 0.4s;
+  padding: 1rem 1rem;
+  border-radius: 0.25rem;
+  box-sizing: border-box;
+}
+
+.br-copy-btn {
   flex: 1 1 0;
   background-color: deeppink;
   color: white;
-  transition: all 0.35s;
-  padding: 1rem 1rem;
-  border-radius: 0.125rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.125rem;
 }
-.br-copier-wrapper__copier button:hover {
-  background-color: #0323cb67;
+
+.br-copy-btn:hover {
+  background-color: #3677d867;
+}
+
+.bookmark-btn {
+  background-color: #ffb300;
+  width: 66px;
+  border: 1px solid #bd8300;
+  color: #000;
+  position: relative;
+  align-self: center;
+}
+
+.bookmark-btn:hover {
+  background-color: #000;
+  color: #bd8300;
+}
+
+.bookmark-btn__share-link-wrapper {
+  position: absolute;
+  padding: 1rem;
+  border-radius: 0.325rem;
+  background-color: #222;
+  color: #fff;
+  z-index: 10;
+  right: -10px;
+  top: calc(100% + 4px);
+  transform: translateY(-15%);
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.2s, box-shadow 0.7s, opacity 0.4s, transform 0.4s;
+}
+
+.bookmark-btn:hover > .bookmark-btn__share-link-wrapper {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0%);
+  box-shadow: 0 0 10px 2px #bd8300, 0 0 20px 4px #ffffff, 0 0 30px 8px #000;
+}
+
+.share-link-wrapper__link-container {
+  display: flex;
+  margin: 0.5rem auto;
+  gap: 0.125rem;
+}
+
+.link-container--link-holder-input {
+  font-size: inherit;
+  outline: none;
+}
+
+.link-container--cpy-btn {
+  border: none;
+  border-radius: 0.25rem;
+  color: black;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 1.75rem;
+  padding: 0.375rem;
+}
+
+.link-container--cpy-btn:hover {
+  background-color: #fff;
+  box-shadow: 0 0 4px 2px #000, 0 0 6px 4px #fff;
 }
 
 .br-value-container {
@@ -46,8 +122,20 @@
   padding: 1rem;
   text-align: center;
   display: inline-block;
-
+  font-family: monospace;
   border-radius: 0.125rem;
+  display: grid;
+  place-content: center;
+}
+
+.share-link-wrapper__socials-share-list {
+  display: flex;
+  gap: 0.375rem;
+  align-items: center;
+  padding: 0.375rem 0.125rem;
+  scroll-behavior: smooth;
+  overflow-x: auto;
+  max-width: 315px;
 }
 
 .input-group__switch {
@@ -112,7 +200,7 @@
 .footer-container {
   width: 95%;
   border-top: 2px solid grey;
-  margin: 2rem auto auto;
+  margin: 6rem auto auto;
   padding: 1rem;
   border-radius: 3px;
   box-sizing: border-box;
@@ -152,13 +240,14 @@
     border-radius: 0.125rem 0 0 0.125rem;
   }
 
-  .br-copier-wrapper__copier button {
+  .br-copy-btn {
     border-radius: 0 0.125rem 0.125rem 0;
   }
 }
 
 @media (min-width: 800px) {
   .br-copier-wrapper {
+    padding: 0;
     flex-direction: row;
     align-items: center;
   }

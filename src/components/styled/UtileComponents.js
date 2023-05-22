@@ -87,3 +87,43 @@ export const FileLabel = styled.label`
     transform: scale(1.1);
   }
 `;
+
+const SocialMediaShareBtn = styled.button`
+  & {
+    box-sizing: border-box;
+    background-color: ${({ $backgroundColor }) => $backgroundColor};
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.25rem;
+    transition: all 0.3s;
+    min-width: 80px;
+  }
+  &:hover {
+    box-shadow: 0 0 5px 2px #fff,
+      0 0 10px 4px ${({ $backgroundColor }) => $backgroundColor},
+      0 0 15px 6px #000;
+  }
+  & * {
+    vertical-align: middle;
+  }
+`;
+
+export const SocialMediaShareAnchor = styled(
+  ({ bgClr, children, ...props }) => {
+    return (
+      <SocialMediaShareBtn $backgroundColor={bgClr}>
+        <a {...props}>
+          {children} <span> Share</span>
+        </a>
+      </SocialMediaShareBtn>
+    );
+  }
+)`
+  & {
+    display: block;
+    box-sizing: border-box;
+    font-size: 1rem;
+    color: white;
+    text-decoration: none;
+  }
+`;

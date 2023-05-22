@@ -1,7 +1,6 @@
 function CostumizerComponent({
   stateObject: { customizable, widthValue, heightValue },
   settersObject: { setCustomizable, setWidthValue, setHeightValue },
-  elemWrapperRef,
 }) {
   return (
     <div className="input-group">
@@ -11,7 +10,7 @@ function CostumizerComponent({
           <input
             className="switch-input"
             type="checkbox"
-            value={customizable}
+            checked={customizable}
             onChange={() => setCustomizable((val) => !val)}
             hidden
           />
@@ -25,11 +24,7 @@ function CostumizerComponent({
             <input
               type="number"
               min={225}
-              max={1000}
-              value={
-                widthValue ??
-                parseInt(elemWrapperRef.current.getBoundingClientRect().width)
-              }
+              value={widthValue}
               onChange={({ target: { value } }) => {
                 setWidthValue(value);
               }}
@@ -40,11 +35,7 @@ function CostumizerComponent({
             <input
               type="number"
               min={225}
-              max={1000}
-              value={
-                heightValue ??
-                parseInt(elemWrapperRef.current.getBoundingClientRect().height)
-              }
+              value={heightValue}
               onChange={({ target: { value } }) => {
                 setHeightValue(value);
               }}
